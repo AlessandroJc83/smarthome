@@ -1,0 +1,2 @@
+self.addEventListener("push",event=>{let data={title:"SmartHome",body:"Nouvelle alerte"};try{if(event.data)data={...data,...event.data.json()}}catch(e){}event.waitUntil(self.registration.showNotification(data.title,{body:data.body,data:{url:"/"}}))});
+self.addEventListener("notificationclick",event=>{event.notification.close();event.waitUntil(clients.matchAll({type:"window",includeUncontrolled:true}).then(list=>{for(const c of list)if("focus"in c)return c.focus();return clients.openWindow(event.notification.data?.url||"/")}))});
