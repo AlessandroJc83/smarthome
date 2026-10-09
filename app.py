@@ -5,12 +5,34 @@ from pywebpush import webpush, WebPushException
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "cle-temporaire-a-remplacer")
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 PUBLIC_KEY_FILE = os.path.join(BASE_DIR, "vapid_public_key.txt")
-PRIVATE_KEY_FILE = os.path.join(BASE_DIR, "vapid_private.pem")
-VAPID_PUBLIC_KEY = open(PUBLIC_KEY_FILE, encoding="utf-8").read().strip() if os.path.exists(PUBLIC_KEY_FILE) else ""
-VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "mailto:admin@example.com")
+LOCAL_PRIVATE_KEY_FILE = os.path.join(BASE_DIR, "vapid_private.pem")
+RENDER_PRIVATE_KEY_FILE = "/etc/secrets/vapid_private.pem"
+
+VAPID_PUBLIC_KEY = (
+    os.environ.get("VAPID_PUBLIC_KEY", "").strip()
+    or (
+        open(PUBLIC_KEY_FILE, encoding="utf-8").read().strip()
+        if os.path.exists(PUBLIC_KEY_FILE)
+        else ""
+    )
+)
+
+VAPID_SUBJECT = os.environ.get(
+    "VAPID_SUBJECT", "mailto:admin@example.com"
+)
+
+PRIVATE_KEY_FILE = (
+    RENDER_PRIVATE_KEY_FILE
+    if os.path.exists(RENDER_PRIVATE_KEY_FILE)
+    else LOCAL_PRIVATE_KEY_FILE
+)
+
 SUBSCRIPTIONS_FILE = os.path.join(BASE_DIR, "push_subscriptions.json")
+
 
 state = {
  "temperature":20,"heating":False,"heating_auto":True,
